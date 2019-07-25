@@ -25,13 +25,30 @@ class App extends Component {
   state = {}
 
   componentDidMount(){
-    console.log(fetch('https://yts.lt/api/v2/list_movies.json?sort_bu=rating'));
+    this._getMovies();
   }
   _renderMovies = () => {
-    const movies = this.state.movies.map((movie, index) => {
-      return <Movie title={movie.title} poster={movie.poster} key={index}/>
+    const movies = this.state.movies.map((movie) => {
+      console.log(movie)
+      return <Movie title={movie.title} poster={movie.large_cover_image} key={movie.id}/>
     })
+    
     return movies
+  }
+
+  _getMovies = async () => {
+    const movies = await this._callApi();
+    this.setState({
+      movies
+    })
+  }
+
+  _callApi = () => {
+    //promise 해당행이 실행되어 결과가 나오지 않으면 다음으로 넘어가지않음
+    return fetch('https://yts.lt/api/v2/list_movies.json?sort_by=like_count')
+    .then(tomato => tomato.json())
+    .then(json => json.data.movies)
+    .catch(err => console.log(err))
   }
 
   render() {
